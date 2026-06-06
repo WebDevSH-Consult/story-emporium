@@ -1,4 +1,3 @@
-```bash
 #!/usr/bin/env bash
 
 set -e
@@ -154,4 +153,3 @@ echo "========================================"
 echo "Location: $BASE_DIR"
 echo "Next step: open story.md and start building"
 echo "========================================"
-```
