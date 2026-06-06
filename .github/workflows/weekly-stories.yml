@@ -1,0 +1,40 @@
+name: Weekly Story Generation
+
+on:
+  schedule:
+    # Sunday 11pm EST (Monday 04:00 UTC)
+    - cron: '0 4 * * 1'
+  workflow_dispatch:
+    inputs:
+      count:
+        description: 'Number of stories to generate'
+        required: false
+        default: '5'
+
+permissions:
+  contents: write
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure git
+        run: |
+          git config user.name "Story Emporium Bot"
+          git config user.email "story-bot@users.noreply.github.com"
+
+      - name: Make scripts executable
+        run: chmod +x *.sh
+
+      - name: Generate stories
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          COUNT=${{ github.event.inputs.count || '5' }}
+          ./weekly-run.sh "$COUNT"
