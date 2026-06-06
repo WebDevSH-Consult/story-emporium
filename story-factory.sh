@@ -1,10 +1,8 @@
-```bash id="a91k2x"
 #!/usr/bin/env bash
 set -e
 
 # =====================================================
-# STORY FACTORY v2
-# One command: generate → build → write → publish → commit
+# STORY FACTORY v2 (CLEAN BASH VERSION)
 # =====================================================
 
 if [ -z "$1" ]; then
@@ -19,61 +17,37 @@ echo " STORY FACTORY INITIATED"
 echo "========================================"
 echo "Title: $TITLE"
 
-# -----------------------------------------------------
-# STEP 1: Generate base story scaffold
-# -----------------------------------------------------
-
+# STEP 1 - Generate base story
 ./generate-story.sh "$TITLE"
 
-# find latest created folder
+# Get latest story folder
 STORY_DIR=$(ls -td stories/drafts/* | head -1)
 
 echo "Story directory: $STORY_DIR"
 
-# -----------------------------------------------------
-# STEP 2: Build structure (AI-ready skeleton)
-# -----------------------------------------------------
-
+# STEP 2 - Build structure
 ./build-story.sh "$STORY_DIR"
 
-# -----------------------------------------------------
-# STEP 3: Write chapters (placeholder AI hooks)
-# -----------------------------------------------------
-
+# STEP 3 - Create chapters
 ./write-story.sh "$STORY_DIR"
 
-# -----------------------------------------------------
-# STEP 4: Publish to website folder
-# -----------------------------------------------------
-
+# STEP 4 - Publish
 ./publish-story.sh "$STORY_DIR"
 
-# -----------------------------------------------------
-# STEP 5: Git automation
-# -----------------------------------------------------
-
+# STEP 5 - Git commit
 if [ -d ".git" ]; then
   echo "Committing to Git..."
 
   git add .
 
-  git commit -m "story: $(basename "$STORY_DIR") - auto generated"
+  git commit -m "story: $TITLE"
 
-  echo "Pushing to remote..."
   git push
-
 else
-  echo "No git repository found. Skipping commit."
+  echo "No git repo found - skipping commit"
 fi
-
-# -----------------------------------------------------
-# DONE
-# -----------------------------------------------------
 
 echo "========================================"
 echo " STORY COMPLETE"
 echo "========================================"
 echo "Location: $STORY_DIR"
-echo "Status: Ready for AI chapter expansion"
-echo "========================================"
-```

@@ -1,29 +1,35 @@
-```bash id="v9k3bb"
 #!/usr/bin/env bash
 set -e
 
-STORY_DIR="$1"
+DIR="$1"
 
-if [ -z "$STORY_DIR" ]; then
-  echo "Usage: ./write-story.sh stories/drafts/your-story"
+if [ -z "$OPENAI_API_KEY" ]; then
+  echo "Missing OPENAI_API_KEY"
   exit 1
 fi
 
-echo "Writing chapters..."
+SYSTEM="You are a bestselling short story writer. Maintain emotional justice style storytelling."
 
 for i in {1..8}
 do
-cat <<EOF > "$STORY_DIR/chapter-$i.md"
-# Chapter $i
-
-[AI GENERATED CONTENT PLACEHOLDER]
-
-Prompt:
-Write Chapter $i of this story using emotional justice storytelling.
-Maintain continuity.
-End with a hook for next chapter.
+  PROMPT=$(cat <<EOF
+Write Chapter $i of a serialized emotional justice story based on existing outline and characters in $DIR.
+Ensure continuity and end with a hook.
 EOF
-done
+)
 
-echo "Chapters created."
-```
+  RESPONSE=$(curl -s https://api.openai.com/v1/chat/completions \
+    -H "Authorization: Bearer $OPENAI_API_KEY" \
+    -H "Content-Type: application/json" \
+    -d "{
+      "model": "gpt-4o-mini",
+      "messages": [
+        {"role": "system", "content": "$SYSTEM"},
+        {"role": "user", "content": "$PROMPT"}
+      ]
+    }")
+
+  TEXT=$(echo "$RESPONSE" | python3 -c "import sys, json; print(json.load(sys.stdin)['choices'][0]['message']['content'])")
+
+  echo "$TEXT" > "$DIR/chapter-$i.md"
+done
